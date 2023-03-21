@@ -13,7 +13,7 @@ authors = [
 
 [[bin]]
 name = "rclip-client-cli"
-path = "src/main.rs"
+path = "src/main_cli.rs"
 
 [dependencies]
 clap = "^2.33"
