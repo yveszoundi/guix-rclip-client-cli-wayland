@@ -5,11 +5,18 @@ Test repository to understand few concepts.
 * What is this?
 
 I'm just experimenting with [[https://guix.gnu.org/manual/en/html_node/Rust-Crates.html][Guix packaging]] of applications written in the [[https://www.rust-lang.org/][Rust]] programming language.
-- This is for =wayland= only (Linux)
+- *This is for Wayland only (Linux)*
 - This is command-line only
 - This is meant to be deployed on a [[https://guix.gnu.org/][Gnu Guix System]] environment
 
 * How do I build it?
+
+#+begin_src sh
+  guix environment -l guix.scm
+  CC=gcc cargo build
+#+end_src
+
+* How do I install it?
 
 You can install the application by running the command below.
 
