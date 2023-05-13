@@ -3,6 +3,7 @@
   #:use-module (gnu packages crates-graphics)
   #:use-module (gnu packages tls)
   #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages perl)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix git-download)
@@ -49,7 +50,8 @@ newspace."
        ("rust-serde-derive"    ,rust-serde-derive-1)
        ("rust-toml"            ,rust-toml-0.5))))
    (native-inputs
-    `(("pkg-config" ,pkg-config)))
+    `(("perl" ,perl)
+      ("pkg-config" ,pkg-config)))
    (inputs
     `(("openssl" ,openssl)))
    (home-page
