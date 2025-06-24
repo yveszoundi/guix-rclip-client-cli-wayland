@@ -1,8 +1,8 @@
 use clap::{App, Arg};
-//use rclip_config;
 use std::error::Error;
 use std::path::Path;
 
+mod clipboard;
 mod common;
 mod rclip_config;
 
@@ -90,7 +90,6 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     }
 
     let cmd_text_opt = run_matches.value_of("text").map(|i| i.to_string()).or(None);
-
     let proposed_cmd = run_matches.value_of("command").unwrap_or("READ");
 
     let clipboard_cmd = match proposed_cmd {
@@ -107,7 +106,7 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
             text: match cmd_text_opt {
                 Some(x) => Some(x.to_string()),
                 _ => {
-                    if let Ok(clipboard_contents) = common::get_clipboard_contents() {
+                    if let Ok(clipboard_contents) = clipboard::get_clipboard_contents() {
                         Some(clipboard_contents)
                     } else {
                         return Err("Could not acquire clipboard contents.".into());

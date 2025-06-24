@@ -1,16 +1,15 @@
-// use copypasta_ext::prelude::*;
-// use copypasta_ext::wayland_bin::WaylandBinClipboardContext;
-//use cli_clipboard::{ClipboardContext, ClipboardProvider};
 use rustls::client::ServerCertVerified;
 use rustls::{Certificate, ServerName};
+
 use std::convert::TryFrom;
-use std::error::Error;
 use std::fs;
 use std::io::{self, Read, Write};
 use std::net;
 use std::path::Path;
 use std::sync::Arc;
 use std::time::SystemTime;
+
+use crate::clipboard;
 
 pub const DEFAULT_CONFIG_FILENAME_CLIENT: &str = "config-client.toml";
 
@@ -61,50 +60,12 @@ impl rustls::client::ServerCertVerifier for AcceptSpecificCertsVerifier {
     }
 }
 
-pub fn get_clipboard_contents() -> Result<String, Box<dyn Error + Send + Sync>> {
-
-use wl_clipboard_rs::{paste::{get_contents, ClipboardType, MimeType, Seat}};
-
-let result = get_contents(ClipboardType::Regular, Seat::Unspecified, MimeType::Text);
-
-if let Ok((mut pipe, _)) = result {
-        let mut contents = vec![];
-        pipe.read_to_end(&mut contents)?;
-        return Ok(String::from_utf8(contents).unwrap());
-    }
-
-return Err("error".into());
-}
-
-
-pub fn set_clipboard_contents(clipboard_text: String) -> Result<(), Box<dyn Error + Send + Sync>> {
-	use nix::{unistd::{fork, ForkResult}};
-	use wl_clipboard_rs::copy::{MimeType, Options, Source};
-
-	match unsafe {fork()} {
-    		Ok(ForkResult::Child) => {
-			let opts = Options::new();
-
-			if opts.copy(Source::Bytes(clipboard_text.into_bytes().into()), MimeType::Autodetect).is_ok() {
-				std::thread::sleep(std::time::Duration::from_secs(10));
-				Ok(())
-			} else {
-				Err("error".into())
-			}        
-    		}
-    		Err(_) => return Err("clipboard fork failed".into()),
-    		_ => { Ok(())}
-	}	
-}
-
-
-
 pub fn send_cmd(
     server_host: String,
     port_number: u16,
     key_pub_loc: String,
     clipboard_cmd: ClipboardCmd,
-) -> Result<(), Box<dyn Error + Send + Sync>> {
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     if !Path::new(&key_pub_loc).exists() {
         return Err(format!("Cannot find public key at: {}", key_pub_loc).into());
     }
@@ -146,7 +107,7 @@ pub fn send_cmd(
                 clipboard_text.push_str("\0"); // workaround or MS expectation???
             }
 
-            set_clipboard_contents(clipboard_text)?;
+            clipboard::set_clipboard_contents(clipboard_text)?;
         }
     } else {
         return Err(response.into());
