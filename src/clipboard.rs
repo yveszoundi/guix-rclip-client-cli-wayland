@@ -12,7 +12,7 @@ pub fn get_clipboard_contents() -> Result<String, Box<dyn std::error::Error + Se
             let mut contents = Vec::with_capacity(1024);
 
             if pipe.read_to_end(&mut contents).is_ok() {
-                return String::from_utf8_lossy(&contents);
+                return Ok(String::from_utf8(contents).unwrap());
             }
         }
 
