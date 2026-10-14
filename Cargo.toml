@@ -18,7 +18,7 @@ path = "src/main_cli.rs"
 [dependencies]
 clap = "2.33.3"
 rustls = { version = "0.21.12", features = ["dangerous_configuration"] }
-wl-clipboard-rs = "0.8"
+wl-clipboard-rs = "0.9.4"
 dirs = "4.0.0"
 serde = { version = "1.0.136", features = ["derive"] }
 toml = "0.5.9"
