@@ -32,7 +32,8 @@ pub fn set_clipboard_contents(text: String) -> Result<(), Box<dyn std::error::Er
     let opts = Options::new();
     let _ = opts.copy(Source::Bytes(text.into_bytes().into()), MimeType::Text);
 
-
+    std::thread::sleep(std::time::Duration::from_secs(10));
+    
     Ok(())
 }
 
