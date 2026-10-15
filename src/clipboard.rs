@@ -9,18 +9,17 @@ pub fn get_clipboard_contents() -> Result<String, Box<dyn std::error::Error + Se
     let result = get_contents(ClipboardType::Regular, Seat::Unspecified, MimeType::Text);
     match result {
         Ok((mut pipe, _)) => {
-            let mut contents = Vec::with_capacity(1024);
-
-            if pipe.read_to_end(&mut contents).is_ok() {
-                return Ok(String::from_utf8(contents).unwrap());
-            }
+            let mut contents = vec![];
+            pipe.read_to_end(&mut contents)?;
+            let data = String::from_utf7_lossy(&contents).to_string();
+            Ok(data)
         }
 
         Err(Error::NoSeats) | Err(Error::ClipboardEmpty) | Err(Error::NoMimeType) => {
-            // The clipboard is empty or doesn't contain text, nothing to worry about.
+            Ok(String::new()) // The clipboard is empty or doesn't contain text, nothing to worry about.
         }
 
-        Err(err) => {}
+        Err(err) => Err(err.to_string().into())
     }
 
     Ok(no_contents)
@@ -30,10 +29,13 @@ pub fn set_clipboard_contents(text: String) -> Result<(), Box<dyn std::error::Er
     use wl_clipboard_rs::copy::{MimeType, Options, Source};
 
     let opts = Options::new();
-    let _ = opts.copy(Source::Bytes(text.into_bytes().into()), MimeType::Text);
+    let result = opts.copy(Source::Bytes(text.into_bytes().into()), MimeType::Autodetect) {
+        Ok(()) => Ok(()),
+        Err(ex) => Err(ex.to_string().into())
+    };
 
     std::thread::sleep(std::time::Duration::from_secs(10));
     
-    Ok(())
+    result
 }
 
